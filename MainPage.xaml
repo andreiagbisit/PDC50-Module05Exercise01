@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Module05Exercise01.MainPage"
+             BackgroundColor="#96d3ff"
+             Padding="20">
+
+    <ScrollView>
+        <Grid VerticalOptions="Center" HorizontalOptions="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <Image 
+                Source="employees.png" 
+                Aspect="AspectFit"
+                WidthRequest="400"
+                HeightRequest="400"
+                Margin="20"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"/>
+
+            <Frame
+                Grid.Column="1" 
+                VerticalOptions="Center"
+                Padding="30"
+                BackgroundColor="White"
+                CornerRadius="10"
+                HasShadow="True"
+                BorderColor="#E0E0E0"
+                HorizontalOptions="Center">
+
+                <VerticalStackLayout Spacing="20">
+                    <Label 
+                        x:Name="MyLabel"
+                        Text="Contact Management System"
+                        FontSize="32"
+                        FontAttributes="Bold"
+                        TextColor="#333333"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Start"/>
+
+                    <Button
+                        Text="Test Connection"
+                        Clicked="OnTestConnectionClicked"
+                        WidthRequest="300"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        Padding="15"
+                        HorizontalOptions="Center"/>
+
+                    <Label
+                        x:Name="ConnectionStatus"
+                        Text="Connection Status:"
+                        FontSize="18"
+                        TextColor="#333333"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Start"/>
+
+                    <Label
+                        x:Name="ConnectionStatusLabel"
+                        FontSize="18"
+                        TextColor="Green"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Start"/>
+
+                    <Button
+                        Text="View Employee Entries"
+                        Clicked="OpenViewPersonal"
+                        WidthRequest="300"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        Padding="15"
+                        HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+    </ScrollView>
+
+</ContentPage>
