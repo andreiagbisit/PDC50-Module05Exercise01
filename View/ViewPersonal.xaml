@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:Module05Exercise01.ViewModel"
              x:Class="Module05Exercise01.View.ViewPersonal"
              Title="ViewPersonal"
              BackgroundColor="#F5F5F5">
@@ -16,41 +17,47 @@
                    HorizontalOptions="Center"
                    TextColor="#333333"/>
 
-            <ListView ItemsSource="{Binding PersonalList}">
+            <ListView ItemsSource="{Binding PersonalList}" SelectedItem="{Binding SelectedPersonal}" HorizontalOptions="Center">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
                             <Frame Padding="10" Margin="10"
-                                   CornerRadius="10"
-                                   BackgroundColor="#D9EFFF"
-                                   BorderColor="Transparent"
-                                   HasShadow="True"
-                                   HorizontalOptions="Center"
-                                   WidthRequest="350">
-                                <StackLayout Orientation="Horizontal" Spacing="10">
+                            CornerRadius="10"
+                            BackgroundColor="#D9EFFF"
+                            BorderColor="Transparent"
+                            HasShadow="True"
+                            HorizontalOptions="Center"
+                            WidthRequest="350">
 
+                                <StackLayout Orientation="Horizontal" Spacing="15" VerticalOptions="CenterAndExpand">
                                     <Image Source="dp.png"
-                                           WidthRequest="50"
-                                           HeightRequest="50"
-                                           VerticalOptions="Center"/>
+                                    WidthRequest="50"
+                                    HeightRequest="50"
+                                    VerticalOptions="Center"/>
 
-                                    <StackLayout Spacing="5">
+                                    <StackLayout Spacing="5" VerticalOptions="Center">
                                         <Label Text="{Binding EmployeeID}"
-                                               FontSize="16"
-                                               TextColor="#333333"/>
-                                        <Label Text="{Binding Name}"
-                                               FontSize="18"
-                                               FontAttributes="Bold"
-                                               TextColor="#000000"/>
-                                        <Label Text="{Binding Address}"
-                                               FontSize="14"
-                                               TextColor="#555555"/>
-                                        <Label Text="{Binding Email}"
-                                               FontSize="14"
-                                               TextColor="#555555"/>
-                                        <Label Text="{Binding ContactNo}"
-                                               FontSize="14"
-                                               TextColor="#555555"/>
+                                        FontSize="16"
+                                        TextColor="#333333"/>
+                                            <Label Text="{Binding Name}"
+                                        FontSize="18"
+                                        FontAttributes="Bold"
+                                        TextColor="#000000"/>
+                                            <Label Text="{Binding Address}"
+                                        FontSize="14"
+                                        TextColor="#555555"/>
+                                            <Label Text="{Binding Email}"
+                                        FontSize="14"
+                                        TextColor="#555555"/>
+                                            <Label Text="{Binding ContactNo}"
+                                        FontSize="14"
+                                        TextColor="#555555"/>
+
+                                        <StackLayout.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type local:PersonalViewModel}}, Path=SelectedPersonCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                        </StackLayout.GestureRecognizers>
                                     </StackLayout>
                                 </StackLayout>
                             </Frame>
@@ -69,6 +76,61 @@
                     FontAttributes="Bold"
                     Padding="15"
                     HorizontalOptions="Center"/>
+
+            <Label Text="" HeightRequest="20"/>
+
+            <Label Text="Add an Employee"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="#333333"/>
+
+            <Entry Placeholder="Name"
+                   BackgroundColor="White"
+                   TextColor="Black"
+                   WidthRequest="350"
+                   Text="{Binding NewPersonalName}"/>
+            
+            <Entry Placeholder="Address"
+                   BackgroundColor="White"
+                   TextColor="Black"
+                   WidthRequest="350"
+                   Text="{Binding NewPersonalAddress}"/>
+            
+            <Entry Placeholder="Email"
+                   BackgroundColor="White"
+                   TextColor="Black"
+                   WidthRequest="350"
+                   Text="{Binding NewPersonalEmail}"/>
+            
+            <Entry Placeholder="Contact No."
+                   BackgroundColor="White"
+                   TextColor="Black"
+                   WidthRequest="350"
+                   Text="{Binding NewPersonalContactNo}"/>
+
+            <StackLayout Orientation="Horizontal"
+                         HorizontalOptions="Center"
+                         Spacing="20">
+                <Button Text="Add Employee" 
+                    Command="{Binding AddPersonalCommand}"
+                    WidthRequest="300"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    Padding="15"
+                    HorizontalOptions="Center"/>
+
+                <Button Text="Delete Employee" 
+                    Command="{Binding DeletePersonCommand}"
+                    IsEnabled="{Binding SelectedPersonal}"
+                    WidthRequest="300"
+                    BackgroundColor="#DC3545"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    Padding="15"
+                    HorizontalOptions="Center"/>
+            </StackLayout>
 
             <Label x:Name="ConnectionStatus"
                    Text="Content Loading Status:"

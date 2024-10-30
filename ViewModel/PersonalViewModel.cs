@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Mysqlx.Crud;
 
 namespace Module05Exercise01.ViewModel
 {
@@ -29,6 +30,39 @@ namespace Module05Exercise01.ViewModel
             }
         }
 
+        private Personal _selectedPersonal;
+
+        public Personal SelectedPersonal
+        {
+            get => _selectedPersonal;
+            set
+            {
+                _selectedPersonal = value;
+                if (_selectedPersonal != null)
+                {
+                    NewPersonalName = _selectedPersonal.Name;
+                    NewPersonalAddress = _selectedPersonal.Address;
+                    NewPersonalEmail = _selectedPersonal.Email;
+                    NewPersonalContactNo = _selectedPersonal.ContactNo;
+                }
+                else
+                {
+                    IsPersonSelected = false;
+                }
+            }
+        }
+
+        private bool _isPersonSelected;
+        public bool IsPersonSelected
+        {
+            get => _isPersonSelected;
+            set
+            {
+                _isPersonSelected = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string _statusMessage;
         public string StatusMessage
         {
@@ -40,7 +74,55 @@ namespace Module05Exercise01.ViewModel
             }
         }
 
+        // New Personal entry for name, address, email, contactno
+        private string _newPersonalName;
+        public string NewPersonalName
+        {
+            get => _newPersonalName;
+            set
+            {
+                _newPersonalName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _newPersonalAddress;
+        public string NewPersonalAddress
+        {
+            get => _newPersonalAddress;
+            set
+            {
+                _newPersonalAddress = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _newPersonalEmail;
+        public string NewPersonalEmail
+        {
+            get => _newPersonalEmail;
+            set
+            {
+                _newPersonalEmail = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _newPersonalContactNo;
+        public string NewPersonalContactNo
+        {
+            get => _newPersonalContactNo;
+            set
+            {
+                _newPersonalContactNo = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICommand LoadDataCommand { get; }
+        public ICommand AddPersonalCommand { get; }
+        public ICommand SelectedPersonCommand { get; }
+        public ICommand DeletePersonCommand { get; }
 
         //PersonalViewModel Constructor
 
@@ -49,6 +131,11 @@ namespace Module05Exercise01.ViewModel
             _personalService = new PersonalService();
             PersonalList = new ObservableCollection<Personal>();
             LoadDataCommand = new Command(async () => await LoadData());
+            AddPersonalCommand = new Command(async() => await AddPerson());
+            SelectedPersonCommand = new Command<Personal>(person => SelectedPersonal = person);
+            DeletePersonCommand = new Command(async() => 
+                                  await DeletePersonal(),
+                                  () => SelectedPersonal != null);
 
             LoadData();
         }
@@ -71,6 +158,81 @@ namespace Module05Exercise01.ViewModel
             catch (Exception ex)
             {
                 StatusMessage = $"Failed to load data: {ex.Message}";
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task AddPerson()
+        {
+            if(IsBusy || string.IsNullOrWhiteSpace(NewPersonalName) || string.IsNullOrWhiteSpace(NewPersonalAddress) || string.IsNullOrWhiteSpace(NewPersonalEmail) || string.IsNullOrWhiteSpace(NewPersonalContactNo))
+            {
+                StatusMessage = "Please fill in all the fields provided before adding an employee.";
+                return;
+            }
+            IsBusy = true;
+            StatusMessage = "Adding new employee...";
+
+            try
+            {
+                var newPersonal = new Personal
+                {
+                    Name = NewPersonalName,
+                    Address = NewPersonalAddress,
+                    Email = NewPersonalEmail,
+                    ContactNo = NewPersonalContactNo
+                };
+                var isSuccess = await _personalService.AddPersonalAsync(newPersonal);
+                if (isSuccess)
+                {
+                    NewPersonalName = string.Empty;
+                    NewPersonalAddress = string.Empty;
+                    NewPersonalEmail = string.Empty;
+                    NewPersonalContactNo = string.Empty;
+                    StatusMessage = "Employee added successfully!";
+                }
+                else
+                {
+                    StatusMessage = "Failed to add the new employee.";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Failed adding employee: {ex.Message}";
+            }
+            finally
+            { 
+                IsBusy = false;
+                await LoadData();
+            }
+        }
+
+        private async Task DeletePersonal()
+        {
+            if (SelectedPersonal == null) return;
+            var answer = await Application.Current.MainPage.DisplayAlert("Confirm Delete", $"Are you sure you want to delete {SelectedPersonal.Name}?",
+                "Yes", "No");
+
+            if (!answer) return;
+            IsBusy = true;
+            StatusMessage = "Deleting Employee...";
+
+            try
+            {
+                var success = await _personalService.DeletePersonalAsync(SelectedPersonal.EmployeeID);
+                StatusMessage = success ? "Employee entry deleted successfully." : "Failed to delete employee entry";
+
+                if (success)
+                {
+                    PersonalList.Remove(SelectedPersonal);
+                    SelectedPersonal = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error deleting the employee entry: {ex.Message}";
             }
             finally
             {
