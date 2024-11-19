@@ -17,7 +17,12 @@
                    HorizontalOptions="Center"
                    TextColor="#333333"/>
 
-            <ListView ItemsSource="{Binding PersonalList}" SelectedItem="{Binding SelectedPersonal}" HorizontalOptions="Center">
+            <SearchBar Placeholder="Search by name, address, email, or contact number..."
+                       Text="{Binding SearchText}"
+                       HorizontalOptions="FillAndExpand"
+                       TextColor="Black"/>
+
+            <ListView ItemsSource="{Binding FilteredPersonalList}" SelectedItem="{Binding SelectedPersonal}" HorizontalOptions="Center">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
@@ -39,17 +44,17 @@
                                         <Label Text="{Binding EmployeeID}"
                                         FontSize="16"
                                         TextColor="#333333"/>
-                                            <Label Text="{Binding Name}"
+                                        <Label Text="{Binding Name}"
                                         FontSize="18"
                                         FontAttributes="Bold"
                                         TextColor="#000000"/>
-                                            <Label Text="{Binding Address}"
+                                        <Label Text="{Binding Address}"
                                         FontSize="14"
                                         TextColor="#555555"/>
-                                            <Label Text="{Binding Email}"
+                                        <Label Text="{Binding Email}"
                                         FontSize="14"
                                         TextColor="#555555"/>
-                                            <Label Text="{Binding ContactNo}"
+                                        <Label Text="{Binding ContactNo}"
                                         FontSize="14"
                                         TextColor="#555555"/>
 
@@ -90,30 +95,32 @@
                    TextColor="Black"
                    WidthRequest="350"
                    Text="{Binding NewPersonalName}"/>
-            
+
             <Entry Placeholder="Address"
                    BackgroundColor="White"
                    TextColor="Black"
                    WidthRequest="350"
                    Text="{Binding NewPersonalAddress}"/>
-            
+
             <Entry Placeholder="Email"
                    BackgroundColor="White"
                    TextColor="Black"
                    WidthRequest="350"
                    Text="{Binding NewPersonalEmail}"/>
-            
+
             <Entry Placeholder="Contact No."
                    BackgroundColor="White"
                    TextColor="Black"
                    WidthRequest="350"
                    Text="{Binding NewPersonalContactNo}"/>
 
-            <StackLayout Orientation="Horizontal"
+            <StackLayout Orientation="Vertical"
                          HorizontalOptions="Center"
                          Spacing="20">
+                
                 <Button Text="Add Employee" 
                     Command="{Binding AddPersonalCommand}"
+                    IsEnabled="{Binding IsPersonSelectedAdd}"
                     WidthRequest="300"
                     BackgroundColor="#2196F3"
                     TextColor="White"
@@ -121,9 +128,19 @@
                     Padding="15"
                     HorizontalOptions="Center"/>
 
+                <Button Text="Update Employee" 
+                    Command="{Binding UpdatePersonCommand}"
+                    IsEnabled="{Binding IsPersonSelected}"
+                    WidthRequest="300"
+                    BackgroundColor="#1CC88A"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    Padding="15"
+                    HorizontalOptions="Center"/>
+
                 <Button Text="Delete Employee" 
                     Command="{Binding DeletePersonCommand}"
-                    IsEnabled="{Binding SelectedPersonal}"
+                    IsEnabled="{Binding IsPersonSelected}"
                     WidthRequest="300"
                     BackgroundColor="#DC3545"
                     TextColor="White"

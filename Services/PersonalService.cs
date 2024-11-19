@@ -92,5 +92,32 @@ namespace Module05Exercise01.Services
                 return false;
             }
         }
+
+        public async Task<bool> UpdatePersonalAsync(Personal updatedPerson) 
+        {
+            try
+            {
+                using (var conn = new MySqlConnection(_connectionString))
+                {
+                    await conn.OpenAsync();
+                    var cmd = new MySqlCommand(
+                        "UPDATE tblemployee SET Name = @Name, Address = @Address, Email = @Email, ContactNo = @ContactNo WHERE EmployeeID = @EmployeeID",
+                        conn);
+                    cmd.Parameters.AddWithValue("@Name", updatedPerson.Name);
+                    cmd.Parameters.AddWithValue("@Address", updatedPerson.Address);
+                    cmd.Parameters.AddWithValue("@Email", updatedPerson.Email);
+                    cmd.Parameters.AddWithValue("@ContactNo", updatedPerson.ContactNo);
+                    cmd.Parameters.AddWithValue("@EmployeeID", updatedPerson.EmployeeID);
+
+                    var result = await cmd.ExecuteNonQueryAsync();
+                    return result > 0; // Returns true if the update was successful
+                }
+            }
+            catch (Exception ex) 
+            {
+                Console.WriteLine($"Error updating employee entry: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

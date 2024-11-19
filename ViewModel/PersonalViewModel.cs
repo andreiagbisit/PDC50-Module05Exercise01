@@ -17,6 +17,19 @@ namespace Module05Exercise01.ViewModel
     {
         private readonly PersonalService _personalService;
         public ObservableCollection<Personal> PersonalList { get; set; }
+        public ObservableCollection<Personal> FilteredPersonalList { get; set; }
+
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                OnPropertyChanged();
+                FilterPersonalList();
+            }
+        }
 
         private bool _isBusy;
         public bool IsBusy
@@ -44,11 +57,15 @@ namespace Module05Exercise01.ViewModel
                     NewPersonalAddress = _selectedPersonal.Address;
                     NewPersonalEmail = _selectedPersonal.Email;
                     NewPersonalContactNo = _selectedPersonal.ContactNo;
+                    IsPersonSelected = true;
+                    IsPersonSelectedAdd = false;
                 }
                 else
                 {
                     IsPersonSelected = false;
+                    IsPersonSelectedAdd = true;
                 }
+                OnPropertyChanged();
             }
         }
 
@@ -59,6 +76,17 @@ namespace Module05Exercise01.ViewModel
             set
             {
                 _isPersonSelected = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isPersonSelectedAdd;
+        public bool IsPersonSelectedAdd
+        {
+            get => _isPersonSelectedAdd;
+            set
+            {
+                _isPersonSelectedAdd = value;
                 OnPropertyChanged();
             }
         }
@@ -121,6 +149,7 @@ namespace Module05Exercise01.ViewModel
 
         public ICommand LoadDataCommand { get; }
         public ICommand AddPersonalCommand { get; }
+        public ICommand UpdatePersonCommand { get; }
         public ICommand SelectedPersonCommand { get; }
         public ICommand DeletePersonCommand { get; }
 
@@ -130,8 +159,10 @@ namespace Module05Exercise01.ViewModel
         {
             _personalService = new PersonalService();
             PersonalList = new ObservableCollection<Personal>();
+            FilteredPersonalList = new ObservableCollection<Personal>();
             LoadDataCommand = new Command(async () => await LoadData());
             AddPersonalCommand = new Command(async() => await AddPerson());
+            UpdatePersonCommand = new Command(async () => await UpdatePerson());
             SelectedPersonCommand = new Command<Personal>(person => SelectedPersonal = person);
             DeletePersonCommand = new Command(async() => 
                                   await DeletePersonal(),
@@ -240,10 +271,76 @@ namespace Module05Exercise01.ViewModel
             }
         }
 
+        private async Task UpdatePerson()
+        {
+            if (IsBusy ||  SelectedPersonal == null)
+            {
+                StatusMessage = "Select an employee entry to update";
+                return;
+            }
+
+            IsBusy = true;
+            try
+            {
+                SelectedPersonal.Name = NewPersonalName;
+                SelectedPersonal.Address = NewPersonalAddress;
+                SelectedPersonal.Email = NewPersonalEmail;
+                SelectedPersonal.ContactNo = NewPersonalContactNo;
+
+                var success = await _personalService.UpdatePersonalAsync(SelectedPersonal);
+                StatusMessage = success ? "Employee entry updated successfully." : "Failed to update employee entry.";
+
+                await LoadData();
+                ClearFields();
+            }
+
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error: {ex.Message}";
+            }
+
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void FilterPersonalList()
+        {
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                FilteredPersonalList.Clear();
+                foreach (var person in PersonalList)
+                {
+                    FilteredPersonalList.Add(person);
+                }
+            }
+            else
+            {
+                var filtered = PersonalList.Where(p => p.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+                                                         || p.Address.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+                                                         || p.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+                                                         || p.ContactNo.Contains(SearchText, StringComparison.OrdinalIgnoreCase)).ToList();
+                FilteredPersonalList.Clear();
+                foreach (var person in filtered)
+                {
+                    FilteredPersonalList.Add(person);
+                }
+            }
+        }
+
+        private void ClearFields()
+        {
+            NewPersonalName = string.Empty;
+            NewPersonalAddress = string.Empty;
+            NewPersonalEmail = string.Empty;
+            NewPersonalContactNo = string.Empty;
         }
     }
 }
